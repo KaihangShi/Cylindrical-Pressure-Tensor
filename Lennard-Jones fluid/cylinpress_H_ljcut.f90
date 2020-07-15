@@ -1,12 +1,19 @@
 ! ==========================================================================
-! This version is for calculating Harasima-like contour local pressure tensor
+!  This version is for calculating Harasima contour local pressure tensor
 !  in cylindrical coordinates
-!  Input file is XYZ coordiantes from MD (LAMMPS) simulation
+!  Input: XYZ coordiantes from MD simulation
 ! 
-!  Attention: No PBC was applied in this version, so reden_cut should be chosen properly
+!  Note: 
+!  1) No periodic boundary condition was applied for pressure calculation 
+!     so rden_cut should be chosen properly
+!  2) No impulsive contribution to the pressure in MD simulation
+!  3) Cylindrical geometry is defined at the center of the box and 
+!     axial direction is aligned with the z-axis of the box
+!  4) Only axial pressure component is calculated; radial and azimuthal component 
+!     are commented out since they give unphysical results in the bulk fluid
 !  
-! Author: Kaihang Shi
-! Last update: September 8, 2019
+!  Author: Kaihang Shi
+!  Last update: September 8, 2019
 ! ==========================================================================
 
 PROGRAM virialpress_cylinder
@@ -15,21 +22,21 @@ IMPLICIT NONE
 
 ! ---------------- Define variables ---------------------------!
 ! Control parameters 
-Integer, Parameter :: n_frame = 79999
+Integer, Parameter :: n_frame = 79999               ! Total number of simulation frames for sampling
 ! System parameter 
-Double Precision, Parameter :: temp = 100.0d0       ! [Kelvin]
+Double Precision, Parameter :: temp = 100.0d0       ! Temperature [Kelvin]
 Integer, Parameter :: n_mol_types = 1               ! number of molecule types  
-Integer, Parameter :: n_mol_tot = 4000              ! total number of molecules in the system
+Integer, Parameter :: n_mol_tot = 4000              ! total number of LJ particles in the system
 ! Intermolecular parameter 
-Double Precision, Parameter :: sigma = 3.405d0      ! [Angstrom] 
-Double Precision, Parameter :: epsilonkb = 119.8d0  ! [Kelvin]
+Double Precision, Parameter :: sigma = 3.405d0      ! LJ sigma [Angstrom] 
+Double Precision, Parameter :: epsilonkb = 119.8d0  ! LJ epsilon/kB [Kelvin]
 Double Precision, Parameter :: r_cut = 10.215d0     ! cutoff radius [Angstrom]
-Double Precision, Parameter :: mol_mass = 39.948d0  ! [g/mol]
+Double Precision, Parameter :: mol_mass = 39.948d0  ! Mass [g/mol]
 ! Parameters for radial density and pressure calculation
-Double Precision, Parameter :: rden_cut = 28.0d0   ! Cutoff distance for density/pressure calculation
-Integer, Parameter :: rden_bins = 1000             ! density profile resolution
-Double Precision, Parameter :: zlo = -10.0         ! lower z-bound for pressure/density calculation 
-Double Precision, Parameter :: zhi = 10.0          ! upper z-bound for pressure/density calculation
+Double Precision, Parameter :: rden_cut = 28.0d0   ! Cutoff distance for density/pressure calculation [Angstrom]
+Integer, Parameter :: rden_bins = 1000             ! density/pressure profile resolution
+Double Precision, Parameter :: zlo = -10.0         ! lower z-bound for pressure/density calculation [Angstrom]
+Double Precision, Parameter :: zhi = 10.0          ! upper z-bound for pressure/density calculation [Angstrom]
 
 ! Box dimension
 Double Precision, Dimension(:,:), Allocatable :: box
@@ -126,7 +133,7 @@ zhi_lim = zhi + r_cut
 Write(*,'(A)') '==========================================================  '
 Write(*,'(A)') ' This program is used to calculate the pressure tensor for  ' 
 Write(*,'(A)') ' cylindrical geometry from virial route                     '
-Write(*,'(A)') ' using the Harasima-like definition of contour'
+Write(*,'(A)') ' using the Harasima definition of contour'
 Write(*,'(A)') '                                                            '  
 Write(*,'(A)') ' This version for simple LJ site molecule with LJ simple cut'
 Write(*,'(A)') ' force. No impulsive contribution for MD simulation.        '
