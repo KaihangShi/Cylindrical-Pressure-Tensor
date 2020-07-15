@@ -31,10 +31,10 @@ Double Precision, Parameter :: epsilonkb = 119.8d0  ! LJ energy parameter (epsil
 Double Precision, Parameter :: r_cut = 10.215d0     ! Cutoff radius [Angstrom]
 Double Precision, Parameter :: mol_mass = 39.948d0  ! Mass [g/mol]
 ! Parameters for radial density and pressure calculation
-Double Precision, Parameter :: rden_cut = 28.0d0   ! Cutoff radius for density/pressure calculation
+Double Precision, Parameter :: rden_cut = 28.0d0   ! Cutoff radius for density/pressure calculation [A]
 Integer, Parameter :: rden_bins = 1000             ! Density/pressure profile resolution
-Double Precision, Parameter :: zlo = -10.0         ! lower bound in axial direction for pressure/density calculation 
-Double Precision, Parameter :: zhi = 10.0          ! upper bound in axial direction for pressure/density calculation
+Double Precision, Parameter :: zlo = -10.0         ! lower bound in axial direction for pressure/density calculation [A]
+Double Precision, Parameter :: zhi = 10.0          ! upper bound in axial direction for pressure/density calculation [A]
 
 ! Box dimension
 Double Precision, Dimension(:,:), Allocatable :: box
