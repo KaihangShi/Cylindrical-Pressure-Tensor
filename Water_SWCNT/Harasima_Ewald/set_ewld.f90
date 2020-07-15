@@ -166,15 +166,15 @@ DO kx = -kxmax,kxmax
               skewld(n_k) = skewld(n_k) + q_o*&
                   & eikx(imol,isite,kx)*eiky(imol,isite,ky)*eikz(imol,isite,kz)
 
-                skewlds(n_k) = skewlds(n_k) + q_o*dzis*&
+              skewlds(n_k) = skewlds(n_k) + q_o*dzis*&
                   & eikx(imol,isite,kx)*eiky(imol,isite,ky)*eikz(imol,isite,kz)
 
-              Else 
-                ! Hydrogen atom in water
-                skewld(n_k) = skewld(n_k) + q_h*&
+            Else 
+              ! Hydrogen atom in water
+              skewld(n_k) = skewld(n_k) + q_h*&
                   & eikx(imol,isite,kx)*eiky(imol,isite,ky)*eikz(imol,isite,kz)
 
-                skewlds(n_k) = skewlds(n_k) + q_h*dzis*&
+              skewlds(n_k) = skewlds(n_k) + q_h*dzis*&
                   & eikx(imol,isite,kx)*eiky(imol,isite,ky)*eikz(imol,isite,kz)
 
             End If
