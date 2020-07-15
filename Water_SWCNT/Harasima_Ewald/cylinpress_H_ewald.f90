@@ -175,14 +175,14 @@ Read(1) natom
 
 ! Check if there is a nanotube in the system
 If(ltube) Then
-	natom_calc = n_sites_tot + n_sites_nt
+  natom_calc = n_sites_tot + n_sites_nt
 Else 
-	natom_calc = n_sites_tot
+  natom_calc = n_sites_tot
 End If 
 
 ! Make sure this run is sensible
 If (natom_calc .NE. natom) Then
-	Write(*,*) 'natom_calc is not equal to natom in DCD file!'
+  Write(*,*) 'natom_calc is not equal to natom in DCD file!'
     STOP
 End If
 
@@ -194,27 +194,27 @@ Do iframe = 1, nd_frame
   
   If (iframe .GE. st_frame) Then
 
-  	! Read in box dimension
-  	Read(1) box(1,c_frame), boxangle(1,c_frame), box(2,c_frame), (boxangle(idirec,c_frame), idirec=2,3), box(3,c_frame)
+    ! Read in box dimension
+    Read(1) box(1,c_frame), boxangle(1,c_frame), box(2,c_frame), (boxangle(idirec,c_frame), idirec=2,3), box(3,c_frame)
 
-  	! Set up box volume [A^3]
-  	volbox(c_frame) = box(1,c_frame)*box(2,c_frame)*box(3,c_frame)
+    ! Set up box volume [A^3]
+    volbox(c_frame) = box(1,c_frame)*box(2,c_frame)*box(3,c_frame)
 
-  	If ((rcelect+2.0d0) .GT. Min(box(1,c_frame),box(2,c_frame))/2.0d0) Then
-    	Write(5,*) 'Cutoff is too large for this box size!'
-    	STOP
-  	End If
+    If ((rcelect+2.0d0) .GT. Min(box(1,c_frame),box(2,c_frame))/2.0d0) Then
+      Write(5,*) 'Cutoff is too large for this box size!'
+      STOP
+    End If
 
   Else
 
-  	Read(1) (dummyr,idirec=1,6)
+    Read(1) (dummyr,idirec=1,6)
 
   ENDIF
 
 
   ! Convert cos value to degree angle
   !Do idirec = 1,3
-  !	boxangle(idirec,iframe) = ACOS(boxangle(idirec,iframe))*180.0d0/Pi
+  ! boxangle(idirec,iframe) = ACOS(boxangle(idirec,iframe))*180.0d0/Pi
   !EndDo
 
   ! ! Now PBC has applied in pressure calculations
@@ -224,15 +224,15 @@ Do iframe = 1, nd_frame
   ! End If
 
   If(ltube) Then
-  	! Read in coordinates of nanotube and water molecules [REAL format]
-  	Read(1) (rx_snt(isite), isite=1,n_sites_nt), (rxs_temp(isite), isite=1,n_sites_tot)
-  	Read(1) (ry_snt(isite), isite=1,n_sites_nt), (rys_temp(isite), isite=1,n_sites_tot)
+    ! Read in coordinates of nanotube and water molecules [REAL format]
+    Read(1) (rx_snt(isite), isite=1,n_sites_nt), (rxs_temp(isite), isite=1,n_sites_tot)
+    Read(1) (ry_snt(isite), isite=1,n_sites_nt), (rys_temp(isite), isite=1,n_sites_tot)
     Read(1) (rz_snt(isite), isite=1,n_sites_nt), (rzs_temp(isite), isite=1,n_sites_tot)
   Else
-  	! No tube, directly read in water atom coordinates
-  	Read(1) (rxs_temp(isite), isite=1,n_sites_tot)
-  	Read(1) (rys_temp(isite), isite=1,n_sites_tot)
-  	Read(1) (rzs_temp(isite), isite=1,n_sites_tot)
+    ! No tube, directly read in water atom coordinates
+    Read(1) (rxs_temp(isite), isite=1,n_sites_tot)
+    Read(1) (rys_temp(isite), isite=1,n_sites_tot)
+    Read(1) (rzs_temp(isite), isite=1,n_sites_tot)
   End If 
 
 
@@ -257,22 +257,22 @@ Do iframe = 1, nd_frame
 
   ! Calculate center of mass position of water molecules (considering PBC)
   Do imol = 1, n_mol_tot
-  	! First hydrogen
-  	rxis = rx_s(2,imol,c_frame) - dNINT((rx_s(2,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
-  	ryis = ry_s(2,imol,c_frame) - dNINT((ry_s(2,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
-  	rzis = rz_s(2,imol,c_frame) - dNINT((rz_s(2,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
-  	! Second hydrogen
-  	rxjs = rx_s(3,imol,c_frame) - dNINT((rx_s(3,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
-  	ryjs = ry_s(3,imol,c_frame) - dNINT((ry_s(3,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
-  	rzjs = rz_s(3,imol,c_frame) - dNINT((rz_s(3,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
-  	! COM
+    ! First hydrogen
+    rxis = rx_s(2,imol,c_frame) - dNINT((rx_s(2,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
+    ryis = ry_s(2,imol,c_frame) - dNINT((ry_s(2,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
+    rzis = rz_s(2,imol,c_frame) - dNINT((rz_s(2,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
+    ! Second hydrogen
+    rxjs = rx_s(3,imol,c_frame) - dNINT((rx_s(3,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
+    ryjs = ry_s(3,imol,c_frame) - dNINT((ry_s(3,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
+    rzjs = rz_s(3,imol,c_frame) - dNINT((rz_s(3,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
+    ! COM
     rx(imol,c_frame) = (rx_s(1,imol,c_frame)*mass_o + (rxis+rxjs)*mass_h)/(mass_o+2.0*mass_h)
     ry(imol,c_frame) = (ry_s(1,imol,c_frame)*mass_o + (ryis+ryjs)*mass_h)/(mass_o+2.0*mass_h)
     rz(imol,c_frame) = (rz_s(1,imol,c_frame)*mass_o + (rzis+rzjs)*mass_h)/(mass_o+2.0*mass_h)
     ! Put COM into the central box
     rx(imol,c_frame) = rx(imol,c_frame) - dNINT(rx(imol,c_frame)/box(1,c_frame))*box(1,c_frame) 
-  	ry(imol,c_frame) = ry(imol,c_frame) - dNINT(ry(imol,c_frame)/box(2,c_frame))*box(2,c_frame) 
-  	rz(imol,c_frame) = rz(imol,c_frame) - dNINT(rz(imol,c_frame)/box(3,c_frame))*box(3,c_frame) 
+    ry(imol,c_frame) = ry(imol,c_frame) - dNINT(ry(imol,c_frame)/box(2,c_frame))*box(2,c_frame) 
+    rz(imol,c_frame) = rz(imol,c_frame) - dNINT(rz(imol,c_frame)/box(3,c_frame))*box(3,c_frame) 
 
   ! End reading imol
   EndDo
@@ -293,9 +293,9 @@ Write(5,*) 'Finished reading coordinates and box information from DCD file!'
 
 ! ---- COM position of nanotube -------!
 Do isite = 1, n_sites_nt
-	rx_nt = rx_nt + rx_snt(isite)
-	ry_nt = ry_nt + ry_snt(isite)
-	rz_nt = rz_nt + rz_snt(isite)
+  rx_nt = rx_nt + rx_snt(isite)
+  ry_nt = ry_nt + ry_snt(isite)
+  rz_nt = rz_nt + rz_snt(isite)
 End Do
 rx_nt = rx_nt/DBLE(n_sites_nt)
 ry_nt = ry_nt/DBLE(n_sites_nt)
@@ -309,16 +309,16 @@ FLUSH(5)
 ! OPEN(3,FILE='testmol.XYZ', STATUS='UNKNOWN',ACCESS='SEQUENTIAL',ACTION='WRITE')
 ! Write(2,*) dummyc, dcdframes,natom
 ! Do iframe = 1, 1
-! 	Write(2,*) box(1,iframe), box(2,iframe), box(3,iframe), boxangle(1,iframe), boxangle(2,iframe), boxangle(3,iframe)
-! 	Do imol = 1, n_mol_tot
-! 		Write (3,'(A,F15.7,F15.7,F15.7)') 'O', rx(imol,iframe), ry(imol,iframe), rz(imol,iframe)
+!   Write(2,*) box(1,iframe), box(2,iframe), box(3,iframe), boxangle(1,iframe), boxangle(2,iframe), boxangle(3,iframe)
+!   Do imol = 1, n_mol_tot
+!     Write (3,'(A,F15.7,F15.7,F15.7)') 'O', rx(imol,iframe), ry(imol,iframe), rz(imol,iframe)
 
-! 		Do isite = 1, n_mol_sites
+!     Do isite = 1, n_mol_sites
 
-! 			! Write to file
-! 			Write(2,*)  rx_s(isite,imol,iframe), ry_s(isite,imol,iframe), rz_s(isite,imol,iframe)
-! 		End Do
-! 	End do
+!       ! Write to file
+!       Write(2,*)  rx_s(isite,imol,iframe), ry_s(isite,imol,iframe), rz_s(isite,imol,iframe)
+!     End Do
+!   End do
 ! End Do
 
 ! ! Close file
@@ -334,30 +334,30 @@ Call CPU_TIME(cpu_st)
 Do iframe = 1, ns_frame
 
   ! Set up averaging region in axial direction
-  zlo = -0.5d0*box(3,iframe)*kavg + cylrz	
+  zlo = -0.5d0*box(3,iframe)*kavg + cylrz 
   zhi =  0.5d0*box(3,iframe)*kavg + cylrz
   
   ! ----------- Sampling molecular r-density ------------!
   ! Loop over all molecules
   Do imol = 1, n_mol_tot
 
-  	! Only sampling over particles within [zlo,zhi]
-  	if((rz(imol,iframe) .ge. zlo) .AND. (rz(imol,iframe) .le. zhi)) Then
+    ! Only sampling over particles within [zlo,zhi]
+    if((rz(imol,iframe) .ge. zlo) .AND. (rz(imol,iframe) .le. zhi)) Then
 
-	    ! Calculate r-distance of imol in cylindrical coordiantes
-	    clrsq = rx(imol,iframe)**2 + ry(imol,iframe)**2
-	    clr = dSQRT(clrsq)
+      ! Calculate r-distance of imol in cylindrical coordiantes
+      clrsq = rx(imol,iframe)**2 + ry(imol,iframe)**2
+      clr = dSQRT(clrsq)
 
-	    If (clr .LT. rden_cut) Then
-	      ! Calculate ibin number
-	      ibin = FLOOR(clr/rden_dr) + 1
+      If (clr .LT. rden_cut) Then
+        ! Calculate ibin number
+        ibin = FLOOR(clr/rden_dr) + 1
 
-	      ! Accumulate number 
-	      rdenblk(ibin,1,iframe) = rdenblk(ibin,1,iframe) + 1.0d0
-	    End If
+        ! Accumulate number 
+        rdenblk(ibin,1,iframe) = rdenblk(ibin,1,iframe) + 1.0d0
+      End If
     ENDIF
 
-  ! End loop over all molecules	
+  ! End loop over all molecules 
   End Do
 
   ! Loop over bins
@@ -373,7 +373,7 @@ Do iframe = 1, ns_frame
 
     End Do          
   End Do  
-	
+  
 
   ! ----------- Sampling cylindrical pressure tensor ----------!   
   ! Set up ewald parameters every frames due to the change of box size
@@ -385,9 +385,9 @@ Do iframe = 1, ns_frame
   ! Loop over all water molecules
   Do imol = 1, n_mol_tot - 1
 
-  	rxi = rx(imol,iframe)
-  	ryi = ry(imol,iframe)
-  	rzi = rz(imol,iframe)
+    rxi = rx(imol,iframe)
+    ryi = ry(imol,iframe)
+    rzi = rz(imol,iframe)
 
     ! Calculate R-distance of molecule i in cylindrical coordiantes
     clri = dSQRT(rxi**2 + ryi**2)
@@ -584,8 +584,8 @@ Do iframe = 1, ns_frame
       If(rzis .GT. (zhi + r_ljcut)) CYCLE
       If(rzis .LT. (zlo - r_ljcut)) CYCLE
 
-	    ! Loop over nanotube atoms 
-	    Do jsite = 1, n_sites_nt
+      ! Loop over nanotube atoms 
+      Do jsite = 1, n_sites_nt
 
         rxjs = rx_snt(jsite)
         ryjs = ry_snt(jsite)
@@ -678,8 +678,8 @@ Do iframe = 1, ns_frame
       ! End jsite on nanotube
       End Do
       
-	  !End loop over imol sites
-	  ENDDO
+    !End loop over imol sites
+    ENDDO
 
   End If 
 
@@ -758,30 +758,30 @@ OPEN(2,FILE='r-density.txt',STATUS='UNKNOWN',ACCESS='SEQUENTIAL',ACTION='WRITE')
 
 ! Loop over bins
 Do ibin = 1, rden_bins
-	! Loop over molecule types
-	Do itype = 1, n_mol_types
+  ! Loop over molecule types
+  Do itype = 1, n_mol_types
 
-		rdenavg(ibin,itype) = rdenavg(ibin,itype)/DBLE(ns_frame)
-    	! Convert unit from [1/A^3] to [g/ml]
-    	rdenavg(ibin,itype) = (mol_mass/(Na*1.0d-24))*rdenavg(ibin,itype)
+    rdenavg(ibin,itype) = rdenavg(ibin,itype)/DBLE(ns_frame)
+      ! Convert unit from [1/A^3] to [g/ml]
+      rdenavg(ibin,itype) = (mol_mass/(Na*1.0d-24))*rdenavg(ibin,itype)
 
-	End Do
+  End Do
 End Do
 
 ! Write data to file
 ! loop over molecule types
 Do itype = 1, n_mol_types
   ! Write molecule info
-	Write(2,*) ' R             R-rho [g/ml]           R-rho [1/A^3]'
+  Write(2,*) ' R             R-rho [g/ml]           R-rho [1/A^3]'
 
-	! Loop over bins
-	Do ibin = 1, rden_bins
+  ! Loop over bins
+  Do ibin = 1, rden_bins
 
-		! Write to file
-		Write(2,'(F8.4,7X,E15.7,8X,E15.7)')  (DBLE(ibin)-0.5d0)*rden_dr, rdenavg(ibin,itype), &
-											& (rdenavg(ibin,itype)/mol_mass)*Na*1.0d-24
-		
-	End Do
+    ! Write to file
+    Write(2,'(F8.4,7X,E15.7,8X,E15.7)')  (DBLE(ibin)-0.5d0)*rden_dr, rdenavg(ibin,itype), &
+                      & (rdenavg(ibin,itype)/mol_mass)*Na*1.0d-24
+    
+  End Do
 End Do
 
 ! Close file
@@ -807,7 +807,7 @@ Do ibin = 1, rden_bins
 
   ! Fluid-wall contribution
   If(ltube) Then
-  	virialptzavg(1,3,ibin) = virialpress_cylin_ptz(1,3,ibin)/DBLE(ns_frame)
+    virialptzavg(1,3,ibin) = virialpress_cylin_ptz(1,3,ibin)/DBLE(ns_frame)
   ENDIF
 
   ! Calculate final pressure (configurational part) in unit of [K/A^3]
@@ -835,14 +835,14 @@ Write(3,'(A)') &
 ! Loop over bins
 Do ibin = 1, rden_bins
 
-	! Write to file
-	Write(3,'(F8.4,F16.4,F16.4,3X,F16.4,6X,F16.4,3X,F16.4,3X,F16.4)')  &
-		& (DBLE(ibin)-0.5d0)*rden_dr, prkin(ibin)*PCOEFF, &
-		& virialptzavg(2,1,ibin)*PCOEFF, &
-		& virialptzavg(2,2,ibin)*PCOEFF, &
-		& virialptzavg(2,3,ibin)*PCOEFF, &
-		& virialptzavg(1,3,ibin)*PCOEFF, &
-		& (prkin(ibin)+virialptzavg(2,1,ibin)+virialptzavg(2,2,ibin)+virialptzavg(2,3,ibin)+virialptzavg(1,3,ibin))*PCOEFF
+  ! Write to file
+  Write(3,'(F8.4,F16.4,F16.4,3X,F16.4,6X,F16.4,3X,F16.4,3X,F16.4)')  &
+    & (DBLE(ibin)-0.5d0)*rden_dr, prkin(ibin)*PCOEFF, &
+    & virialptzavg(2,1,ibin)*PCOEFF, &
+    & virialptzavg(2,2,ibin)*PCOEFF, &
+    & virialptzavg(2,3,ibin)*PCOEFF, &
+    & virialptzavg(1,3,ibin)*PCOEFF, &
+    & (prkin(ibin)+virialptzavg(2,1,ibin)+virialptzavg(2,2,ibin)+virialptzavg(2,3,ibin)+virialptzavg(1,3,ibin))*PCOEFF
 
 
 End Do
@@ -881,13 +881,7 @@ Deallocate(eikz)
 Deallocate(skewld)
 Deallocate(skewlds)
 
-	
+  
 
 
 END PROGRAM virialpress_cylinder
-
-
-
-
-
-
