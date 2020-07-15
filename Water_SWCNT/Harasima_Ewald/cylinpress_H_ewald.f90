@@ -1,15 +1,15 @@
 ! ==========================================================================
-! This version is for calculating molecular local pressure tensor by the Harasima definition
-!  developed in cylindrical coordinates
-! 
-!  1. Lennard-Jones potential is cut in the real space
-!  2. Coulombic interaction is treated by the Ewald method
+! This version is for calculating molecular axial pressure of water in a single-wall 
+! carbon nanotube by the Harasima/Ewald method
+!  Note: 
+!  1. Lennard-Jones potential is cut in the real space;
+!  2. Coulombic interaction is treated by the Ewald method;
 !     rcelect and alpha is pre-specified 
 !     kmax = alpha*max[boxlength]/Pi*sqrt(-ln(ewld_prec))
-!  3. No impulsive contribution (LJ) for MD simulation
-!  4. Input file is DCD coordiantes from MD (LAMMPS) simulation
-!  5. PBC has been applied in the pressure calculation
-!  6. The COM position of nanotube is assumed fixed in the center of the box (z=0)
+!  3. No impulsive contribution to the (LJ) pressure for MD simulation;
+!  4. Input file is DCD coordiantes from MD (LAMMPS) simulation;
+!  5. PBC has been applied in the pressure calculation;
+!  6. The COM position of nanotube is assumed fixed in the center of the box (z=0);
 !  
 ! Author: Kaihang Shi
 ! Last update: Nov. 4, 2019
