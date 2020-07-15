@@ -15,6 +15,13 @@ For molecular system (demonstration of rigid water in single-wall carbon nanotub
 
 /Water_SWCNT/
 - cylinpress_IK_ljcoulcut.f90 (local axial pressure using Irving-Kirkwood definition with simple cutoff)
-/Water_SWCNT/Harasima_Ewald/
-- 
 
+/Water_SWCNT/Harasima_Ewald/
+- cylinpress_H_ewald.f90 (main program; local axial pressure using Harasima/Ewald method)
+- ewald_mol.f90 (subroutine to evaluate pressure in reciprocal space)
+- global.f90 (module containing global data)
+- set_ewld.f90 (subroutine to set up Ewald parameters)
+
+## Usage
+1. Set up the system parameters (temperature, potential paramters, profile resolution etc.) at the beginning of the main program.
+2. compile the fortran code as usual.
