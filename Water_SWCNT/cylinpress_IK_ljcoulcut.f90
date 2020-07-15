@@ -1,6 +1,6 @@
 ! ==========================================================================
-! This version is for calculating molecular axial pressure by the IK definition
-!  in cylindrical coordinates
+! This version is for calculating molecular axial pressure of rigid water inside a 
+! single-wall carbon nanotube by the IK definition
 ! 
 !  Note: 
 !  1. Lennard-Jones potential and Coulombic potential are both cut in the real space
