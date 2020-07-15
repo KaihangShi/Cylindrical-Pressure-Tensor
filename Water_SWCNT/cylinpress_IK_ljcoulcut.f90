@@ -1,7 +1,8 @@
 ! ==========================================================================
-! This version is for calculating molecular local pressure tensor by the IK definition
+! This version is for calculating molecular axial pressure by the IK definition
 !  in cylindrical coordinates
 ! 
+!  Note: 
 !  1. Lennard-Jones potential and Coulombic potential are both cut in the real space
 !  2. No impulsive contribution for MD simulation
 !  3. Input file is DCD coordiantes from MD (LAMMPS) simulation
@@ -17,12 +18,12 @@ IMPLICIT NONE
 
 ! ---------------- Define control variables ---------------------------!
 ! First and last frame for samplings
-Integer, Parameter :: st_frame = 1                    
-Integer, Parameter :: nd_frame = 80000                  
+Integer, Parameter :: st_frame = 100                 ! First frame for sampling
+Integer, Parameter :: nd_frame = 80000               ! Last frame for sampling
 ! DCD file PATH 
-Character*32, Parameter :: dcdpath = "/share/gubbins/kshi3/outcnt1.dcd"  
+Character*32, Parameter :: dcdpath = "/xxx/xxx/xxx/xxx.dcd"  
 ! System parameter 
-Double Precision, Parameter :: temp = 300.0d0       ! [Kelvin]
+Double Precision, Parameter :: temp = 300.0d0       ! Temperature [Kelvin]
 Integer, Parameter :: n_mol_types = 1               ! number of molecule types for DENSITY calculations
 Integer, Parameter :: n_mol_tot = 7500              ! total number of water molecules in the system
 Integer, Parameter :: n_sites_tot = 22500            ! Total number of atoms in all water molecules 
@@ -34,10 +35,10 @@ Double Precision, Parameter :: radi_nt = 13.565d0       ! Radius of the nanotube
 Double Precision, Parameter :: hlflen_nt = 30.129d0       ! Half length of the nanotube [Angstrom]; used for acceleration of simulation                            
 ! Intermolecular parameter 
 Double Precision, Parameter :: sigma_co = 3.1900d0     ! cross-sigma for oxygen-carbon interaction [Angstrom]
-Double Precision, Parameter :: epsilonkb_co = 47.1470064248d0 ! cross interaction for oxygen-carbon [Kelvin]
+Double Precision, Parameter :: epsilonkb_co = 47.1470064248d0 ! cross-epsilon/kB for oxygen-carbon [Kelvin]
 Double Precision, Parameter :: sigma_oo = 3.166d0      ! sigma for oxygen-oxygen interaction [Angstrom] 
-Double Precision, Parameter :: epsilonkb_oo = 78.177560234d0  ! for oxygen-oxygen interaction [Kelvin]
-Double Precision, Parameter :: r_ljcut = 5.0d0     ! LJ cutoff radius [Angstrom]
+Double Precision, Parameter :: epsilonkb_oo = 78.177560234d0  ! epsilon/kB for oxygen-oxygen interaction [Kelvin]
+Double Precision, Parameter :: r_ljcut = 10.0d0     ! LJ cutoff radius [Angstrom]
 Double Precision, Parameter :: r_coulcut = 10.0d0     ! Coulombic cutoff radius [Angstrom]
 ! Mass 
 Double Precision, Parameter :: mol_mass = 18.01528d0  ! molecular weight of water [g/mol]
@@ -50,7 +51,7 @@ Double Precision, Parameter :: q_h = 0.4238       ! point charge for H [e]
 Double Precision, Parameter :: rden_cut = 24.5d0   ! Cutoff distance for density/pressure calculation
 Integer, Parameter :: rden_bins = 300               ! density profile resolution
 Double Precision, Parameter :: kavg = 0.2          ! L = Lz * kavg; where Lz is the box dimension in z-axis and L is the height of cylinder
-Double Precision, Parameter :: cylrz = 0.0d0       ! COM z-position of the defined cylinder where sampling is performed 
+Double Precision, Parameter :: cylrz = 0.0d0       ! Center z-position of the defined cylinder where sampling is performed 
 
 
 ! --------------- Define basic variables -------------------------------!
@@ -205,21 +206,21 @@ Do iframe = 1, nd_frame
   ! Read in box dimension
   If (iframe .GE. st_frame) Then
 
-  	Read(1) box(1,c_frame), boxangle(1,c_frame), box(2,c_frame), (boxangle(idirec,c_frame), idirec=2,3), box(3,c_frame)
+    Read(1) box(1,c_frame), boxangle(1,c_frame), box(2,c_frame), (boxangle(idirec,c_frame), idirec=2,3), box(3,c_frame)
 
-  	! the water bond is 1 A, to make sure both molecular COM and atom positon satisfy the minimum image convention
-  	If ((r_coulcut+2.0d0) .GT. Min(box(1,c_frame),box(2,c_frame))/2.0d0) Then
-  		Write(5,*) 'Cutoff is too large for this box size!'
-    	STOP
-  	End If
+    ! the water bond is 1 A, to make sure both molecular COM and atom positon satisfy the minimum image convention
+    If ((r_coulcut+2.0d0) .GT. Min(box(1,c_frame),box(2,c_frame))/2.0d0) Then
+      Write(5,*) 'Cutoff is too large for this box size!'
+      STOP
+    End If
 
   Else
-  	Read(1) (dummyr,idirec=1,6)
+    Read(1) (dummyr,idirec=1,6)
   ENDIF
 
   ! Convert cos value to degree angle
   !Do idirec = 1,3
-  !	boxangle(idirec,iframe) = ACOS(boxangle(idirec,iframe))*180.0d0/Pi
+  ! boxangle(idirec,iframe) = ACOS(boxangle(idirec,iframe))*180.0d0/Pi
   !EndDo
 
   ! ! Now PBC has applied in pressure calculations
@@ -262,22 +263,22 @@ Do iframe = 1, nd_frame
 
   ! Calculate center of mass position of each molecule (considering PBC)
   Do imol = 1, n_mol_tot
-  	! First hydrogen
-  	rxis = rx_s(2,imol,c_frame) - dNINT((rx_s(2,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
-  	ryis = ry_s(2,imol,c_frame) - dNINT((ry_s(2,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
-  	rzis = rz_s(2,imol,c_frame) - dNINT((rz_s(2,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
-  	! Second hydrogen
-  	rxjs = rx_s(3,imol,c_frame) - dNINT((rx_s(3,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
-  	ryjs = ry_s(3,imol,c_frame) - dNINT((ry_s(3,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
-  	rzjs = rz_s(3,imol,c_frame) - dNINT((rz_s(3,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
-  	! COM
+    ! First hydrogen
+    rxis = rx_s(2,imol,c_frame) - dNINT((rx_s(2,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
+    ryis = ry_s(2,imol,c_frame) - dNINT((ry_s(2,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
+    rzis = rz_s(2,imol,c_frame) - dNINT((rz_s(2,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
+    ! Second hydrogen
+    rxjs = rx_s(3,imol,c_frame) - dNINT((rx_s(3,imol,c_frame)-rx_s(1,imol,c_frame))/box(1,c_frame))*box(1,c_frame)
+    ryjs = ry_s(3,imol,c_frame) - dNINT((ry_s(3,imol,c_frame)-ry_s(1,imol,c_frame))/box(2,c_frame))*box(2,c_frame)
+    rzjs = rz_s(3,imol,c_frame) - dNINT((rz_s(3,imol,c_frame)-rz_s(1,imol,c_frame))/box(3,c_frame))*box(3,c_frame)
+    ! COM
     rx(imol,c_frame) = (rx_s(1,imol,c_frame)*mass_o + (rxis+rxjs)*mass_h)/(mass_o+2.0*mass_h)
     ry(imol,c_frame) = (ry_s(1,imol,c_frame)*mass_o + (ryis+ryjs)*mass_h)/(mass_o+2.0*mass_h)
     rz(imol,c_frame) = (rz_s(1,imol,c_frame)*mass_o + (rzis+rzjs)*mass_h)/(mass_o+2.0*mass_h)
     ! Put COM into the central box
     rx(imol,c_frame) = rx(imol,c_frame) - dNINT(rx(imol,c_frame)/box(1,c_frame))*box(1,c_frame) 
-  	ry(imol,c_frame) = ry(imol,c_frame) - dNINT(ry(imol,c_frame)/box(2,c_frame))*box(2,c_frame) 
-  	rz(imol,c_frame) = rz(imol,c_frame) - dNINT(rz(imol,c_frame)/box(3,c_frame))*box(3,c_frame) 
+    ry(imol,c_frame) = ry(imol,c_frame) - dNINT(ry(imol,c_frame)/box(2,c_frame))*box(2,c_frame) 
+    rz(imol,c_frame) = rz(imol,c_frame) - dNINT(rz(imol,c_frame)/box(3,c_frame))*box(3,c_frame) 
 
   ! End reading imol
   EndDo
@@ -313,16 +314,16 @@ Close(5)
 ! OPEN(3,FILE='testmol.XYZ', STATUS='UNKNOWN',ACCESS='SEQUENTIAL',ACTION='WRITE')
 ! Write(2,*) dummyc, dcdframes,natom
 ! Do iframe = 1, 1
-! 	Write(2,*) box(1,iframe), box(2,iframe), box(3,iframe), boxangle(1,iframe), boxangle(2,iframe), boxangle(3,iframe)
-! 	Do imol = 1, n_mol_tot
-! 		Write (3,'(A,F15.7,F15.7,F15.7)') 'O', rx(imol,iframe), ry(imol,iframe), rz(imol,iframe)
+!   Write(2,*) box(1,iframe), box(2,iframe), box(3,iframe), boxangle(1,iframe), boxangle(2,iframe), boxangle(3,iframe)
+!   Do imol = 1, n_mol_tot
+!     Write (3,'(A,F15.7,F15.7,F15.7)') 'O', rx(imol,iframe), ry(imol,iframe), rz(imol,iframe)
 
-! 		Do isite = 1, n_mol_sites
+!     Do isite = 1, n_mol_sites
 
-! 			! Write to file
-! 			Write(2,*)  rx_s(isite,imol,iframe), ry_s(isite,imol,iframe), rz_s(isite,imol,iframe)
-! 		End Do
-! 	End do
+!       ! Write to file
+!       Write(2,*)  rx_s(isite,imol,iframe), ry_s(isite,imol,iframe), rz_s(isite,imol,iframe)
+!     End Do
+!   End do
 ! End Do
 
 ! ! Close file
@@ -342,23 +343,23 @@ Do iframe = 1, ns_frame
   ! Loop over all molecules
   Do imol = 1, n_mol_tot
 
-  	! Only sampling over particles within [zlo,zhi]
-  	if((rz(imol,iframe) .ge. zlo) .AND. (rz(imol,iframe) .le. zhi)) Then
+    ! Only sampling over particles within [zlo,zhi]
+    if((rz(imol,iframe) .ge. zlo) .AND. (rz(imol,iframe) .le. zhi)) Then
 
-	    ! Calculate r-distance of imol in cylindrical coordiantes
-	    clrsq = rx(imol,iframe)**2 + ry(imol,iframe)**2
-	    clr = dSQRT(clrsq)
+      ! Calculate r-distance of imol in cylindrical coordiantes
+      clrsq = rx(imol,iframe)**2 + ry(imol,iframe)**2
+      clr = dSQRT(clrsq)
 
-	    If (clr .LT. rden_cut) Then
-	      ! Calculate ibin number
-	      ibin = FLOOR(clr/rden_dr) + 1
+      If (clr .LT. rden_cut) Then
+        ! Calculate ibin number
+        ibin = FLOOR(clr/rden_dr) + 1
 
-	      ! Accumulate number 
-	      rdenblk(ibin,1,iframe) = rdenblk(ibin,1,iframe) + 1.0d0
-	    End If
+        ! Accumulate number 
+        rdenblk(ibin,1,iframe) = rdenblk(ibin,1,iframe) + 1.0d0
+      End If
     ENDIF
 
-  ! End loop over all molecules	
+  ! End loop over all molecules 
   End Do
 
   ! Loop over bins
@@ -374,7 +375,7 @@ Do iframe = 1, ns_frame
 
     End Do          
   End Do  
-	
+  
 
   ! ----- Sampling cylindrical pressure tensor -------!   
 
@@ -382,9 +383,9 @@ Do iframe = 1, ns_frame
   ! Loop over all molecules
   Do imol = 1, n_mol_tot - 1
 
-  	rxi = rx(imol,iframe)
-  	ryi = ry(imol,iframe)
-  	rzi = rz(imol,iframe)
+    rxi = rx(imol,iframe)
+    ryi = ry(imol,iframe)
+    rzi = rz(imol,iframe)
 
     ! Calculate R-distance of molecule i in cylindrical coordiantes
     !clri = dSQRT(rxi**2 + ryi**2)
@@ -847,30 +848,30 @@ OPEN(2,FILE='r-density.txt',STATUS='UNKNOWN',ACCESS='SEQUENTIAL',ACTION='WRITE')
 
 ! Loop over bins
 Do ibin = 1, rden_bins
-	! Loop over molecule types
-	Do itype = 1, n_mol_types
+  ! Loop over molecule types
+  Do itype = 1, n_mol_types
 
-		rdenavg(ibin,itype) = rdenavg(ibin,itype)/DBLE(ns_frame)
+    rdenavg(ibin,itype) = rdenavg(ibin,itype)/DBLE(ns_frame)
     ! Convert unit from [1/A^3] to [g/ml]
     rdenavg(ibin,itype) = (mol_mass/(Na*1.0d-24))*rdenavg(ibin,itype)
 
-	End Do
+  End Do
 End Do
 
 ! Write data to file
 ! loop over molecule types
 Do itype = 1, n_mol_types
   ! Write molecule info
-	Write(2,*) ' R             R-rho [g/ml]           R-rho [1/A^3]'
+  Write(2,*) ' R             R-rho [g/ml]           R-rho [1/A^3]'
 
-	! Loop over bins
-	Do ibin = 1, rden_bins
+  ! Loop over bins
+  Do ibin = 1, rden_bins
 
-		! Write to file
-		Write(2,'(F8.4,7X,E15.7,8X,E15.7)')  (DBLE(ibin)-0.5d0)*rden_dr, rdenavg(ibin,itype), &
-											& (rdenavg(ibin,itype)/mol_mass)*Na*1.0d-24
-		
-	End Do
+    ! Write to file
+    Write(2,'(F8.4,7X,E15.7,8X,E15.7)')  (DBLE(ibin)-0.5d0)*rden_dr, rdenavg(ibin,itype), &
+                      & (rdenavg(ibin,itype)/mol_mass)*Na*1.0d-24
+    
+  End Do
 End Do
 
 ! Close file
@@ -956,7 +957,7 @@ Deallocate(virialptzavg)
 Deallocate(prkin) 
 Deallocate(rdenavg) 
 Deallocate(rdenblk) 
-	
+  
 
 
 END PROGRAM virialpress_cylinder
