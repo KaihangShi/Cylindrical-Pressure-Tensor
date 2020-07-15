@@ -26,7 +26,7 @@ IMPLICIT NONE
 Integer, Parameter :: st_frame = 1                   ! Starting frame
 Integer, Parameter :: nd_frame = 1               ! End frame
 ! DCD file PATH 
-Character*32, Parameter :: dcdpath = "/share/gubbins/kshi3/outcnt1.dcd"
+Character*32, Parameter :: dcdpath = "/xxx/xxx/xxx/xxx.dcd"
 ! System parameter 
 Double Precision, Parameter :: temp = 300.0d0       ! [Kelvin]
 Integer, Parameter :: n_mol_types = 1               ! number of molecule types for DENSITY calculations
