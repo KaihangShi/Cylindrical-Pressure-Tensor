@@ -1,5 +1,5 @@
 # Cylindrical-Pressure-Tensor
-Post-analysis code for calculating the local pressure tensor in a Lennard-Jones or molecular system having cylindrical geometries/interfaces. 
+Post-analysis code for the local pressure tensor in a Lennard-Jones or molecular system having cylindrical geometries/interfaces. 
 
 ## Requirement
 gfortran
