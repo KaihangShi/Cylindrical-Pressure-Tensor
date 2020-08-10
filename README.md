@@ -1,7 +1,7 @@
 # Cylindrical-Pressure-Tensor
 Post-analysis code for the local pressure tensor in a Lennard-Jones or molecular system having cylindrical geometries/interfaces. 
 
-Reference: Shi et al. https://pubs.acs.org/doi/abs/10.1021/acs.jctc.0c00607
+Reference: Shi et al. https://pubs.acs.org/doi/abs/10.1021/acs.jctc.0c00607[https://pubs.acs.org/doi/abs/10.1021/acs.jctc.0c00607]
 
 ## Requirement
 gfortran
